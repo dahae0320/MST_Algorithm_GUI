@@ -10,6 +10,7 @@ window.resizable(False, False)  # 윈도우 크기 변경 불가능
 node_number = 0
 node = [] # 노드의 좌표값
 node_V = [] # 전체 노드를 행렬로 표현(가중치 표기)
+edge_weight = []
 
 def drawingNode(event):
   global node_number
@@ -31,10 +32,13 @@ def drawingNode(event):
 
 
 def drawingEdge(event, start: str, end: str, weight: str):
-  s_x = node[int(start)-1][0]
-  s_y = node[int(start)-1][1]
-  e_x = node[int(end)-1][0]
-  e_y = node[int(end)-1][1]
+  start = int(start)
+  end = int(end)
+  weight = int(weight)
+  s_x = node[start-1][0]
+  s_y = node[start-1][1]
+  e_x = node[end-1][0]
+  e_y = node[end-1][1]
   w_x, w_y = drawingWeight(int(s_x), int(s_y), int(e_x), int(e_y))
   # 간선이 다른 원과 중복되어 그려지지 않도록 확인한다.
   if doesCollide(node, s_x, s_y, e_x, e_y):
@@ -44,14 +48,16 @@ def drawingEdge(event, start: str, end: str, weight: str):
     main_canvas.create_line(s_x, s_y, e_x, e_y, fill="black")
     main_canvas.create_text(w_x, w_y, text=weight, fill="blue")
     # 노드의 가중치 배열에 가중치 넣기
-    node_V[int(start)-1][int(end)-1] = weight
-    node_V[int(end)-1][int(start)-1] = weight
+    node_V[start-1][end-1] = weight
+    node_V[end-1][start-1] = weight
+    edge_weight.append([start,end,weight])
 
   print("node_V, Edge :", node_V)
+  print("edge_weight : ", edge_weight)
+
 
 def doesCollide(node, x1, y1, x2, y2) -> bool:
-  # start(x1, y1), end(x2, y2)
-  # y=ax+c, ax+by+c=0, b=-1
+  # start(x1, y1), end(x2, y2) / y=ax+c, ax+by+c=0, b=-1
   a = abs(y1-y2) / abs(x1-x2)
   b = -1
   c = y1 - a*x1
@@ -67,12 +73,12 @@ def doesCollide(node, x1, y1, x2, y2) -> bool:
     y_min = y1; y_max = y2
 
   for x, y, num in node:
-    print(x_min, x_max, y_min, y_max, x, y)
     if x_min < x < x_max and y_min < y < y_max:
       d = abs(a*x1 + b*y1 + c) / sqrt(a**2 + b**2)  # 점과 직선 사이의 거리
       if d <= 13: # 반지름의 길이 : 13
         return True
   return False
+
 
 def drawingWeight(s_x, s_y, e_x, e_y):
   if s_x > e_x:
@@ -86,6 +92,15 @@ def drawingWeight(s_x, s_y, e_x, e_y):
     mid_y = (e_y - s_y) / 2 + s_y
 
   return (mid_x, mid_y)
+
+
+def kruskal() -> list:
+  pass
+
+
+def prim() -> list:
+  pass
+
 
 def drawingPrimNode(event):
   for n in range(len(node)):
@@ -101,6 +116,7 @@ def drawingKruscalNode(event):
     y = node[n][1]
     kruskal_canvas.create_oval(x-13,y-13, x+13, y+13, fill="skyblue", width=0)
     kruskal_canvas.create_text(x, y, text=str(n+1))
+
 
 # 프레임 설정
 # frame1
